@@ -30,14 +30,19 @@ def handle_invalid_usage(error):
 def sitemap():
     return generate_sitemap(app)
 
-@app.route('/todos', methods=['POST'])
+    
+
+@app.route('/todos', methods=['POST', 'GET'])
 def handle_todos():
-    body = request.get_json()
-    new_todo = Todo(label=body["label"], done=False)
-    print(new_todo)
-    db.session.add(new_todo)
-    db.session.commit()
-    return jsonify(new_todo.serialize()), 200
+    if request.method == 'POST':
+        body = request.get_json()
+        new_todo = Todo(label=body["label"], done=False)
+        db.session.add(new_todo)
+        db.session.commit()
+        return jsonify(new_todo.serialize()), 200
+    else:
+        tasks = Todo.query.all()
+        return jsonify(tasks)
 
 # this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
